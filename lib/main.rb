@@ -20,7 +20,7 @@ require "hem_objects"
 
 # The following has a token for my site, so please be careful - and it is subject to change ;)
 
-response = HemAdapter.send_command(:command => '/api_sites/f7444ad62e7a7d9c6beb9c2f3a0455dff8c61f6a.xml',
+response = HemAdapter.send_command(:command => '/api_sites/site_f368b195a1d974457595a90416a312e11e48be94.xml',
                                     :method => :get)
 
 
@@ -29,7 +29,10 @@ site = HemAdapter.parse_response(:command => "api_sites",
                                   :xml_body => response)
 puts site
 
-puts site.site_token 
+puts site.name
+puts site.type
+puts site.site_resource
+puts site.site_token
 puts site.last_ip_address
 puts site.poll_frequency
 puts site.poll_scatter
