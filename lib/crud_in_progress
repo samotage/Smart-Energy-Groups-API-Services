@@ -1,0 +1,88 @@
+
+
+#response = HemAdapter.send_command( :command => '/api_streams/stream_data.xml',
+#                                    :options => {"token" => "ca10e649b7c2f0b85debb1120438560462ceab91",
+#                                      "stream_id" => 28,
+#                                      "limit" => 8},
+#                                    :method => :get,
+#                                    :host => "localhost",
+#                                    :port => 3000)
+#
+#puts response
+
+
+#http://localhost:3000/api_streams/stream_data.xml
+#token=ca10e649b7c2f0b85debb1120438560462ceab91
+#stream_id=28?limit=8
+
+#
+# Post some streamage
+#
+# Local SEGGER
+#
+# string = BuildStream.make_stream_xml(  :stream_id => 2,
+#                                       #:token => "5d3d2d0f57de7939f7601a28fc41131db8bd1880",
+#                                       :login => "samotage",
+#                                       :password => "energy",
+#                                       :value => 99,
+#                                       :number_points => 1)
+#
+#
+#
+#puts string
+#
+#response = HemAdapter.send_command(:command => '/api_streams/add_points',
+#                                   :options => {"xml_data" => string },
+#                                   :method => :post,
+#                                   :host => "localhost",
+#                                   :port => 3000)
+#
+### Remote SEGGER
+
+#string = BuildStream.make_stream_xml(  :stream_id => 28,
+#                                       :token => "ca10e649b7c2f0b85debb1120438560462ceab91",
+#                                       :number_points => 100)
+
+#For Donals device
+#fake token for documentation
+#ca10e775b7d2f0b25debb1120438560462ceab96
+
+start_time =  Time.utc(2009,"jan",1,00,00,00)  #=> 2000-01-01 20:15:01 UTC
+
+#string = BuildStream.make_stream_xml(  :external_id => "stream_7748242",
+#                                       :token => "ca10e649b7c2f0b85debb1120438560462ceab91",
+#                                       :date_time => start_time,
+#                                       :number_points => 2)
+
+#string = BuildAskHem.make_call_xml( :site_token => "f368b195a1d974457595a90416a312e11e48be94",
+#                                            :ext_stream_id => "stream_9948242",
+#                                            :serial_num => "switch_meter_002",
+#                                            :command_id => "12",
+#                                            :command_status => "Complete",
+#                                            :command_executed => Time.now,
+#                                            :date_time => start_time,
+#                                            :number_points => 2)
+#
+#
+#puts string
+
+
+#response = HemAdapter.send_command(:command => '/api_streams/add_points',
+#                                   :options => {"xml_data" => string },
+#                                   :method => :post)
+
+#response = HemAdapter.send_command(:command => '/api_streams/add_points.xml',
+#                                   :options => {"data_post" => string },
+#                                   :method => :post,
+#                                   :host => "localhost",
+#                                   :port => 3000)
+#
+#
+#response = HemAdapter.send_command(:command => '/api_sites/071462c70fe9336604505dbe957d43dfa86ead87.xml',
+#                                   :options => {"data_post" => string },
+#                                   :method => :put,
+#                                   :host => "localhost",
+#                                   :port => 3000)
+#
+#puts response
+
