@@ -1,0 +1,65 @@
+Hem Services
+
+This ruby program provides an easy to use interface to the Home Energy Manager RESTful services.
+
+There will be spelling mistakes in here, so be forewarned.  This isn't shakespeare after all ;)
+
+If you do find something in here that bothers you, or need some help, send me a note at
+sam dot sabey at smartenergygroups.com  I will be too happy to help.
+
+
+To get this going, get it from git:
+
+<git link>
+
+
+###  Dependencies:
+
+You will need ruby installed
+You will need rubygems installed
+
+Note, the objective is to not require a Rails installation.
+You can go here to find the answer to the above two questions:
+http://rubyonrails.org/download
+Note, just follow the Ruby and Rubygems parts.  Skip rails.  (unless you want to get on da train)
+
+
+Gem Dependencies
+
+gem install builder   #This makes XML for use by the program.
+
+
+###  Usage
+
+Note, have a look into the file main.rb, which goes through some usage examples, which work.
+This will be useful to run, and figure ou what's going on when yoru computer interacts with the HEM.
+
+To get useful information about the site you want to interact with make the following call:
+
+in this example, the long winded token represents your Site Token for the site in question.
+You can find this out from HEM.
+
+You can choose to get XML or json representations of the response by modifying the requesty
+
+
+For json
+response = HemAdapter.send_command(:command => '/api_sites/f368b195a1d974457595a90416a312e11e48be94.json',
+                                    :method => :get)
+
+For xml
+response = HemAdapter.send_command(:command => '/api_sites/f368b195a1d974457595a90416a312e11e48be94.xml',
+                                    :method => :get)
+
+This will give a whole bunch of xml to play with, which you can fiddle and parse to your heards content,
+or you could send it in on into the parser that will return you a nice site object, complete with the relevant
+gear all mapped out for your ease of programatic interaction.
+
+site = HemAdapter.parse_response(:command => "api_sites",
+                                  :method => :get,
+                                  :xml_body => response)
+
+
+
+
+
+
