@@ -12,12 +12,8 @@ module HemAdapter
     options = ""
 
     # default ports for the api
-    #
-    # This will be changing to api, however -
-    # this version uses the hem subdomain, which will be deprecated.
 
-    # host = "api.smartenergygroups.com"
-    host = "hem.smartenergygroups.com"
+    host = "api.smartenergygroups.com"
     port = 80
     
     args.first.each do |key, value|
