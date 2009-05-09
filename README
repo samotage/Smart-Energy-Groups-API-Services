@@ -54,10 +54,14 @@ This will give a whole bunch of xml to play with, which you can fiddle and parse
 or you could send it in on into the parser that will return you a nice site object, complete with the relevant
 gear all mapped out for your ease of programatic interaction.
 
-site = HemAdapter.parse_response(:command => "api_sites",
-                                  :method => :get,
-                                  :xml_body => response)
+There are other useful examples inside the files
 
+Important, have a gander at:
+
+   api_sites_put_example.rb
+   api_sites_get_example.rb
+
+   for a working example to fiddle about with
 
 
 
