@@ -2,7 +2,10 @@
 require 'rubygems'
 require 'builder'
 require "hem_adapter"
+require "build_api_sites"
 require "hem_objects"
+require "response_parser"
+require "log_outputs"
 
 # README
 #
@@ -13,17 +16,35 @@ require "hem_objects"
 #
 # Note you WILL need to get your site key, available within HEM when you edit your site.
 #
-
+##################
+#
+#  Important, have a gander at:
+#  
+#   api_sites_put_example.rb
+#   api_sites_get_example.rb
+#
+#   for a working example to fiddle about with
+#
+##################
 
 
 # The following has a token for my site, so please be careful - and it is subject to change ;)
 
-response = HemAdapter.send_command(:command => '/api_sites/site_f368b195a1d974457595a90416a312e11e48be94.xml',
-                                    :method => :get)
+response = HemAdapter.send_command(
+  :command => '/api_sites/site_42121f21b26e7adf0dece67f356090b07167f93a.xml',
+  :method => :get)
 
 
-site = HemAdapter.parse_response(:command => "api_sites",
-                                  :method => :get,
-                                  :xml_body => response)
+site = ResponseParser.api_sites(
+  :command => "api_sites",
+  :method => :get,
+  :xml_body => response)
+
+if site != nil
+  LogOutputs.site_to_screen(site)
+else
+  puts "got nothing back from Hem"
+end
+
 
 
