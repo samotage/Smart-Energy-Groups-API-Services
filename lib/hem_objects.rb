@@ -26,6 +26,7 @@ module HemObjects
 
   class HemObjects::Device
     attr_accessor :serial
+    attr_accessor :device_seq
     attr_accessor :device_resource
     attr_accessor :name
     attr_accessor :type
@@ -34,6 +35,7 @@ module HemObjects
 
     def initialize
       @serial = nil
+      @device_seq = nil
       @device_resource = nil
       @name = nil
       @type = nil
@@ -67,6 +69,7 @@ module HemObjects
 
   class HemObjects::Stream
     attr_accessor :ext_stream_id
+    attr_accessor :stream_seq
     attr_accessor :stream_resource
     attr_accessor :updated_at
     attr_accessor :stream_type
@@ -76,6 +79,7 @@ module HemObjects
 
     def initalize
       @ext_stream_id = nil
+      @strea_seq = nil
       @stream_resource = nil
       @updated_at = nil
       @stream_type = nil
