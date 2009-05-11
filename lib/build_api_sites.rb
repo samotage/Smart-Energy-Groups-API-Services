@@ -56,7 +56,6 @@ module BuildApiSites
     # Note, if it goes to the screen, it won't get to HEM... so to go to hem, make sure
     # the target is the buffer, not $stdout
 
-
     # xml = Builder::XmlMarkup.new(:target => $stdout, :indent => 2)
     xml = Builder::XmlMarkup.new(:target=>buffer)
 
