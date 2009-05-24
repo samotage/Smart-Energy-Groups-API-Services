@@ -81,9 +81,7 @@ json_string = %|
 site = HemAdapter.send_command(
   :command => '/api_sites/site_a8db2cfd72fc45f6b5910314a703c42969b1f5e6.json',
   :method => :put,
-  :options => {"data_post" => json_string },
-  :host => "localhost",
-  :port => 3000)
+  :options => {"data_post" => json_string })
 
 #
 ## A remote example, defaults to api.smartenergygroups.com on port 80
