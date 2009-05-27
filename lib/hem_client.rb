@@ -28,9 +28,7 @@ while true do
 
     response = HemAdapter.send_command(
       :command => "/api_sites/#{site_token}.xml",
-      :method => :get,
-      :host => "localhost",
-      :port => 3000)
+      :method => :get)
 
     site = ResponseParser.api_sites(
       :command => "api_sites",
@@ -63,9 +61,7 @@ while true do
     response = HemAdapter.send_command(
       :command => "/api_sites/#{site_token}.xml",
       :method => :put,
-      :options => {"data_post" => xml},
-      :host => "localhost",
-      :port => 3000)
+      :options => {"data_post" => xml})
 
     data_logged = true
 
