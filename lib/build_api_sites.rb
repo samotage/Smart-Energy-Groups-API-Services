@@ -12,13 +12,12 @@ module BuildApiSites
     ext_stream_id = ""
     device_serial_num = ""
 
-
     number_points = 0
     date_time = Time.now
     point_value = 0
+    command_action = false
     make_data = false
     increment = 30
-
 
     command_id = ""
     command_status = ""
@@ -32,6 +31,8 @@ module BuildApiSites
         ext_stream_id = value
       when :device_serial_num
         device_serial_num = value
+      when :command_action
+        command_action = value
       when :command_id
         command_id = value
       when :command_status
@@ -68,11 +69,13 @@ module BuildApiSites
         xml.device do
           xml.serial           device_serial_num
 
-          xml.commands do
-            xml.command do
-              xml.command_id        command_id
-              xml.status            command_status
-              xml.executed_at       command_executed
+          if command_action
+            xml.commands do
+              xml.command do
+                xml.command_id        command_id
+                xml.status            command_status
+                xml.executed_at       command_executed
+              end
             end
           end
 
