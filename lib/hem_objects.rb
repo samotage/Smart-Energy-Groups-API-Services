@@ -3,7 +3,7 @@ module HemObjects
   class HemObjects::Site
     attr_accessor :name
     attr_accessor :type
-    attr_accessor :site_token
+    attr_accessor :token
     attr_accessor :site_resource
     attr_accessor :last_ip_address
     attr_accessor :poll_frequency
@@ -14,7 +14,7 @@ module HemObjects
     def initialize
       @name = nil
       @type = nil
-      @site_token = nil
+      @token = nil
       @site_resource = nil
       @last_ip_address = nil
       @poll_frequency = nil
@@ -25,8 +25,8 @@ module HemObjects
   end
 
   class HemObjects::Device
-    attr_accessor :serial
-    attr_accessor :device_seq
+    attr_accessor :serial_num
+    attr_accessor :index_seq
     attr_accessor :device_resource
     attr_accessor :name
     attr_accessor :type
@@ -34,8 +34,8 @@ module HemObjects
     attr_accessor :streams, :commands
 
     def initialize
-      @serial = nil
-      @device_seq = nil
+      @serial_num = nil
+      @index_seq = nil
       @device_resource = nil
       @name = nil
       @type = nil
@@ -68,22 +68,24 @@ module HemObjects
   end
 
   class HemObjects::Stream
-    attr_accessor :ext_stream_id
-    attr_accessor :stream_seq
+    attr_accessor :external_id
+    attr_accessor :sequence
     attr_accessor :stream_resource
     attr_accessor :updated_at
     attr_accessor :stream_type
     attr_accessor :unit_type
+    attr_accessor :parameter
     
     attr_accessor :points
 
     def initalize
-      @ext_stream_id = nil
-      @strea_seq = nil
+      @external_id = nil
+      @sequence = nil
       @stream_resource = nil
       @updated_at = nil
       @stream_type = nil
       @unit_type = nil
+      @parameter = nil
 
       @points = Array.new
     end

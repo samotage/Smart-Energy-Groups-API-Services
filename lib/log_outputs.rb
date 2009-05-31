@@ -17,8 +17,8 @@ module LogOutputs
 
     site.devices.each do |device|
 
-      puts   ".new.device." + device.serial
-      puts   "............" + device.device_seq
+      puts   ".new.device." + device.serial_num
+      puts   "............" + device.index_seq
       puts   "............" + device.device_resource
       puts   "............" + device.name
       puts   "............" + device.type
@@ -35,8 +35,8 @@ module LogOutputs
       end
 
       device.streams.each do |stream|
-        puts   ".new.stream./...stream..." + stream.ext_stream_id
-        puts   "............/...stream..." + stream.stream_seq
+        puts   ".new.stream./...stream..." + stream.external_id
+        puts   "............/...stream..." + stream.sequence
         puts   "............/...stream..." + stream.stream_resource
         puts   "............/...stream..." + stream.updated_at
         puts   "............/...stream..." + stream.stream_type

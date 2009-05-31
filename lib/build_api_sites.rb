@@ -6,10 +6,71 @@ module BuildApiSites
   #  Warning, this is subject to deprecation as this whole shebang is going to change.
   #
 
+  def BuildApiSites.site_to_xml(site)
+    buffer = ""
+
+    # Toggle the following to put the XML out to the screen nicely formatted.
+    #
+    # Note, if it goes to the screen, it won't get to HEM... so to go to hem, make sure
+    # the target is the buffer, not $stdout
+
+    # xml = Builder::XmlMarkup.new(:target => $stdout, :indent => 2)
+    xml = Builder::XmlMarkup.new(:target=>buffer)
+
+    xml.instruct!
+
+    xml.site do
+
+      xml.name         site.name
+      xml.token        site.token
+
+      xml.devices do
+        site.devices.each do |device|
+          xml.device  do
+            xml.serial_num           device.serial_num
+            xml.index_seq            device.index_seq
+
+            xml.commands do
+              device.commands.each do |command|
+                xml.command do
+                  xml.command_id        command.command_id
+                  xml.status            command.status
+                  xml.executed_at       command.executed_at
+                end
+              end
+            end
+
+            xml.streams do
+              device.streams.each do |stream|
+                xml.stream do
+                  xml.external_id     stream.external_id
+                  xml.sequence        stream.sequence
+                  xml.parameter        stream.parameter
+
+                  if stream.points != nil &&  stream.points.size > 0
+                    xml.points do
+                      stream.points.each do |point|
+                        xml.point do
+                          xml.point_date    point.point_date.strftime("%Y-%m-%d %H:%M:%S")
+                          xml.value         point.value.to_s
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+    return buffer
+  end
+
   def BuildApiSites.make_put_xml(*args)
 
-    site_token = ""
-    ext_stream_id = ""
+    token = ""
+    external_id = ""
     device_serial_num = ""
 
     number_points = 0
@@ -25,10 +86,10 @@ module BuildApiSites
 
     args.first.each do |key, value|
       case key
-      when :site_token
-        site_token = value
-      when :ext_stream_id
-        ext_stream_id = value
+      when :token
+        token = value
+      when :external_id
+        external_id = value
       when :device_serial_num
         device_serial_num = value
       when :command_action
@@ -64,10 +125,10 @@ module BuildApiSites
 
     xml.instruct!
     xml.site do
-      xml.site_token        site_token
+      xml.token        token
       xml.devices do
         xml.device do
-          xml.serial           device_serial_num
+          xml.serial_num           device_serial_num
 
           if command_action
             xml.commands do
@@ -81,7 +142,7 @@ module BuildApiSites
 
           xml.streams do
             xml.stream do
-              xml.ext_stream_id     ext_stream_id
+              xml.external_id     external_id
 
               xml.points do
                 if !make_data

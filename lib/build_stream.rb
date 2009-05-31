@@ -51,7 +51,7 @@ module BuildStream
       xml.login       login
       xml.password    password
       xml.user_token  token
-      xml.ext_stream_id external_id
+      xml.external_id external_id
       
       while i < number_points do
         xml.point do

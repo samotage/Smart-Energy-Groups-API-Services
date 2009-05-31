@@ -1,50 +1,46 @@
+#!/usr/local/bin/ruby
 
-require 'rubygems'
-require 'builder'
-require "hem_adapter"
-require "build_api_sites"
-require "hem_objects"
-require "response_parser"
-require "log_outputs"
+# The hem ruby client, the good one for Samotage
 
-# README
-#
-# This program doesn't represent any actual usefulness for your projects apart from demonstrating the
-# useage of the various functions within the HEM adaptor.
-#
-# So test away as you please, and you can incorporate these method calls within your ruby project.
-#
-# Note you WILL need to get your site key, available within HEM when you edit your site.
-#
-##################
-#
-#  Important, have a gander at:
-#  
-#   api_sites_put_example.rb
-#   api_sites_get_example.rb
-#
-#   for a working example to fiddle about with
-#
-##################
+require 'hem_client'
 
+SERVER_TIMEOUT = 10 # seconds
+SLEEPY_TIME = 120 # seconds
+SERIAL_WAIT = 0.2 # seconds
+QUIET = false # if true, no output to screen.
+WHINY = false  # if true, and not quiet, verbose output - otherwise minimal output.
 
-# The following has a token for my site, so please be careful - and it is subject to change ;)
+while true do
+  all_ok = false
+  begin
+    hem_client = HemClient::Client.new
 
-response = HemAdapter.send_command(
-  :command => '/api_sites/site_42121f21b26e7adf0dece67f356090b07167f93a.xml',
-  :method => :get)
+    if hem_client != nil
+      all_ok = hem_client.run_loop
+    end
+  rescue
+    if !QUIET
+      puts "something has broken, so we have a little nap for #{SLEEPY_TIME} seconds"
+    end
+    sleep(NAP_WAIT)
+  end
+  hem_client = nil
 
-
-site = ResponseParser.api_sites(
-  :command => "api_sites",
-  :method => :get,
-  :xml_body => response)
-
-if site != nil
-  LogOutputs.site_to_screen(site)
-else
-  puts "got nothing back from Hem"
+  if all_ok
+    if !QUIET
+      puts "---------refreshing the HEM client----------------------"
+      puts " "
+    end
+  else
+    if !QUIET
+      puts "something wierd is going on, so we have a little nap for #{SLEEPY_TIME} seconds"
+      if !QUIET 
+        sleep(SLEEPY_TIME)
+      end
+    end
+  end
 end
+
 
 
 

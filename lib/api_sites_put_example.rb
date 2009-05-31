@@ -24,7 +24,7 @@ require "log_outputs"
 
 xml = BuildApiSites.make_put_xml(
   :site_token => "site_5a8b9b4ba4bb7adee7cec91450a4cdd099e5f208",
-  :ext_stream_id => "stream_9948242",
+  :external_id => "stream_9948242",
   :device_serial_num => "switch_meter_002",
   :command_id => "1",
   :command_status => "Complete",

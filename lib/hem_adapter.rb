@@ -2,6 +2,8 @@
 require 'net/http'
 require 'nokogiri'
 require "hem_objects"
+
+LOG_SCREEN = false
   
 module HemAdapter
 
@@ -10,6 +12,7 @@ module HemAdapter
     command = ""
     method = :get
     options = ""
+    
 
     # default ports for the api
 
@@ -34,7 +37,9 @@ module HemAdapter
     # Open an HTTP connection to grid.smartenergygroups.com
 
     begin
-      puts command
+      if LOG_SCREEN
+        puts command
+      end
 
       http = Net::HTTP.new(host, port)
       headers={}
@@ -63,13 +68,20 @@ module HemAdapter
       response = http.request(req)
 
       if response.is_a?(Net::HTTPSuccess)
-        puts "the response from HEM was all good"
+        if LOG_SCREEN
+          puts "the adaptor command to HEM turned out just fine"
+        end
       else
-        puts "the response from HEM indicated there was a problemo..."
+        if LOG_SCREEN
+          puts "something went ka-boom with the HEM adaptor command..."
+        end
       end
       return response.body
     end
   rescue Exception => e
-    puts "The internetz have pwned your rqst within this adaptrix Net::HTTP #{ e } (#{ e.class })!"
+    if LOG_SCREEN
+      puts "The internetz have pwned your rqst within this adaptrix Net::HTTP #{ e } (#{ e.class })!"
+    end
+    return false
   end
 end
