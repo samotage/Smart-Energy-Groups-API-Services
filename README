@@ -12,6 +12,17 @@ To get this going, get it from git:
 
 <git link>
 
+### Ruby
+
+The scripts assume you have compliled your own ruby, and Ruby lives at:
+
+/usr/local/bin/ruby
+
+If however you have installed the package via some other release mechanism,
+just remove the local from the above path to read
+
+/usr/bin/ruby
+
 
 ###  Dependencies:
 
@@ -26,7 +37,48 @@ Note, just follow the Ruby and Rubygems parts.  Skip rails.  (unless you want to
 
 Gem Dependencies
 
-gem install builder   #This makes XML for use by the program.
+gem install builder   # This makes XML for use by the program.
+gem install termios   # this allows the program to talk to your USB serial port
+gem install nokigiri  # this parses XML
+
+
+### Nokogiri notes.
+
+This top gem can be a little windy to install, and here is the procedure I've used:
+
+
+...Prep for nokogiri XML parser taken from
+http://hightechsorcery.com/2008/12/howto-install-nokogiri-gem-ubuntu
+
+>>> Install libxml2
+http://www.techsww.com/tutorials/libraries/libxml/installation/installing_libxml_on_ubuntu_linux.php
+
+as root, do the following
+
+wget ftp://xmlsoft.org/libxml2/libxml2-sources-2.7.3.tar.gz
+tar -xvzf libxml2-sources-2.7.3.tar.gz
+cd libxml2-2.7.3
+./configure --prefix=/usr/local/libxml2
+make
+make install
+
+>>> Install libxslt
+http://www.techsww.com/tutorials/libraries/libxslt/installation/installing_libxslt_on_ubuntu_linux.php
+
+as root do the following
+
+sudo -i
+cd sources
+
+wget ftp://xmlsoft.org/libxslt/libxslt-1.1.24.tar.gz
+tar -xvzf libxslt-1.1.24.tar.gz
+cd libxslt-1.1.24
+./configure --prefix=/usr/local/libxslt --with-libxml-prefix=/usr/local/libxml2/
+make
+make install
+
+sudo apt-get install libxml2-dev libxslt1-dev
+sudo gem install nokogiri
 
 
 ###  Usage
