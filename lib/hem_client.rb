@@ -204,10 +204,12 @@ module HemClient
               puts "about to get s_exp, count: #{count}"
             end
             Timeout::timeout(SERVER_TIMEOUT) do
+              
               s_exp = self.serial_conn.gets
+
             end
             if !QUIET && WHINY
-              puts "got s_exp and about to parse"
+              puts "got s_exp: #{s_exp} and about to parse"
             end
             if s_exp != nil &&  s_exp != ""
               result = SExpression.parse(s_exp)
@@ -231,7 +233,7 @@ module HemClient
           if !QUIET && WHINY
             puts "...looking for value #{stream.parameter} attempt #{count}"
           end
-          sleep(SERIAL_WAIT)
+          # sleep(SERIAL_WAIT)
           count += 1
         end
       end

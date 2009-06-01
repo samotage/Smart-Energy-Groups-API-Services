@@ -8,7 +8,7 @@ SERVER_TIMEOUT = 10 # seconds
 SLEEPY_TIME = 120 # seconds
 SERIAL_WAIT = 0.2 # seconds
 QUIET = false # if true, no output to screen.
-WHINY = false  # if true, and not quiet, verbose output - otherwise minimal output.
+WHINY = true  # if true, and not quiet, verbose output - otherwise minimal output.
 
 while true do
   all_ok = false
