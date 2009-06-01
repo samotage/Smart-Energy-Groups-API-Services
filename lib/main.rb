@@ -22,7 +22,7 @@ while true do
     if !QUIET
       puts "something has broken, so we have a little nap for #{SLEEPY_TIME} seconds"
     end
-    sleep(NAP_WAIT)
+    sleep(SLEEPY_TIME)
   end
   hem_client = nil
 
