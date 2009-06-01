@@ -78,6 +78,10 @@ make
 make install
 
 sudo apt-get install libxml2-dev libxslt1-dev
+
+gem sources -a http://gems.github.com
+sudo gem install tenderlove-frex
+
 sudo gem install nokogiri
 
 
