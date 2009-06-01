@@ -15,6 +15,7 @@ require "s_expression"
 
 IO_SPEED = 115200
 LOOP_COUNT = 20
+SERIAL_COUNT = 10
 IS_PROD = true
 
 ## Sam's Home
@@ -93,6 +94,9 @@ module HemClient
               end
               got_data = false
             end
+          else
+            # Lets try re-establish the serial connection by failing.
+            return false
           end
           count += 1
           if !QUIET && WHINY
@@ -191,7 +195,7 @@ module HemClient
 
     def poll_device_stream(stream)
       count = 1
-      countout = 15
+      countout = SERIAL_COUNT
       acquired_data = false
       # we are looking for s expressions on the serial feed that match our stream's parameter
       if stream != nil && stream != ""
@@ -233,7 +237,7 @@ module HemClient
           if !QUIET && WHINY
             puts "...looking for value #{stream.parameter} attempt #{count}"
           end
-          # sleep(SERIAL_WAIT)
+          sleep(SERIAL_WAIT)
           count += 1
         end
       end
