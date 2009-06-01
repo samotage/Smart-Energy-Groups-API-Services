@@ -49,11 +49,14 @@ module HemClient
       begin
         @serial_conn = File.open("/dev/ttyUSB0")
       rescue
-        begin
-          @serial_conn = File.open("/dev/ttyUSB1")
-        rescue
-          @serial_conn = File.open("/dev/ttyUSB2")
-        end
+        # Only want USB0
+        return nil
+
+#        begin
+#          @serial_conn = File.open("/dev/ttyUSB1")
+#        rescue
+#          @serial_conn = File.open("/dev/ttyUSB2")
+#        end
       end
       if @serial_conn != nil
         tio = Termios.tcgetattr(@serial_conn)
