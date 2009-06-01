@@ -84,7 +84,6 @@ sudo gem install tenderlove-frex
 
 sudo gem install nokogiri
 
-
 ###  Usage
 
 Note, have a look into the file main.rb, which goes through some usage examples, which work.
