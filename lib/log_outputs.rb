@@ -26,7 +26,7 @@ module LogOutputs
       device.commands.each do |command|
         puts   ".new_commad./...command..." + command.command_id
         puts   "............/...command..." + command.command_resource
-        puts   "............/...command..." + command.comand_type
+        puts   "............/...command..." + command.command_type
         puts   "............/...command..." + command.status
         puts   "............/...command..." + command.execute_at
         puts   "............/...command..." + command.executed_at

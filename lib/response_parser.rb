@@ -40,7 +40,7 @@ module ResponseParser
             # Yes, the following could be kleener, but hey...
             #
 
-            site = HemObjects::Site.new
+            site = ObjSite::Site.new
 
             site.name = site_element.css('name').first.content
             site.token = site_element.css('token').first.content
@@ -52,7 +52,8 @@ module ResponseParser
             site_element.xpath('//devices').each do |devices_element|
               
               devices_element.xpath('//devices/device').each do |device_element|
-                device = HemObjects::Device.new
+                device = ObjDevice::Device.new
+                device.site = site
 
                 device_xml_string = device_element.to_s
                 device_xml_doc = Nokogiri::XML.parse(device_xml_string)
@@ -62,14 +63,17 @@ module ResponseParser
                 device.device_resource = device_xml_doc.css('device_resource').first.content
                 device.name = device_xml_doc.css('name').first.content
                 device.type = device_xml_doc.css('type').first.content
+                device.status = device_xml_doc.css('status').first.content
+                device.switchable = device_xml_doc.css('switchable').first.content
 
                 device_xml_doc.xpath('//commands/command').each do |command_element|
 
-                  command = HemObjects::Command.new
+                  command = ObjCommand::Command.new
+                  command.device = device
 
                   command.command_id = command_element.css('command_id').first.content
                   command.command_resource = command_element.css('command_resource').first.content
-                  command.comand_type = command_element.css('comand_type').first.content
+                  command.command_type = command_element.css('command_type').first.content
                   command.status = command_element.css('status').first.content
                   command.execute_at = command_element.css('execute_at').first.content
                   command.executed_at = command_element.css('executed_at').first.content
@@ -81,7 +85,8 @@ module ResponseParser
 
                 device_xml_doc.xpath('//streams/stream').each do |stream_element|
 
-                  stream = HemObjects::Stream.new
+                  stream = ObjStream::Stream.new
+                  stream.device = device
 
                   stream.external_id= stream_element.css('external_id').first.content
                   stream.sequence = stream_element.css('sequence').first.content

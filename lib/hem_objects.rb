@@ -30,6 +30,8 @@ module HemObjects
     attr_accessor :device_resource
     attr_accessor :name
     attr_accessor :type
+    attr_accessor :status
+    attr_accessor :switchable
 
     attr_accessor :streams, :commands
 
@@ -39,6 +41,8 @@ module HemObjects
       @device_resource = nil
       @name = nil
       @type = nil
+      @status = nil
+      @switchable = nil
 
       @streams = Array.new
       @commands = Array.new
@@ -48,7 +52,7 @@ module HemObjects
   class HemObjects::Command
     attr_accessor :command_id
     attr_accessor :command_resource
-    attr_accessor :comand_type
+    attr_accessor :command_type
     attr_accessor :status
     attr_accessor :execute_at
     attr_accessor :executed_at
@@ -58,7 +62,7 @@ module HemObjects
     def initialize
       @command_id = nil
       @command_resource = nil
-      @comand_type = nil
+      @command_type = nil
       @status = nil
       @execute_at = nil
       @executed_at = nil

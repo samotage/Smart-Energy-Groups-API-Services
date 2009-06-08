@@ -3,7 +3,7 @@ require 'net/http'
 require 'nokogiri'
 require "hem_objects"
 
-LOG_SCREEN = false
+LOG_SCREEN = true
   
 module HemAdapter
 
@@ -82,6 +82,6 @@ module HemAdapter
     if LOG_SCREEN
       puts "The internetz have pwned your rqst within this adaptrix Net::HTTP #{ e } (#{ e.class })!"
     end
-    return false
+    return nil
   end
 end

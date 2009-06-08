@@ -4,9 +4,9 @@
 
 require 'hem_client'
 
-SERVER_TIMEOUT = 10 # seconds
+SERVER_TIMEOUT = 5 # seconds
 SLEEPY_TIME = 10 # seconds
-SERIAL_WAIT = 0.2 # seconds
+
 QUIET = false # if true, no output to screen.
 WHINY = true  # if true, and not quiet, verbose output - otherwise minimal output.
 
@@ -18,23 +18,26 @@ while true do
     if hem_client != nil
       all_ok = hem_client.run_loop
     end
-  rescue
-    if !QUIET
-      puts "something has broken, so we have a little nap for #{SLEEPY_TIME} seconds"
+
+    if !all_ok
+      if !QUIET
+        puts "...trouble opening the serial connection"
+      end
     end
-    sleep(SLEEPY_TIME)
+  rescue
+    all_ok = false
   end
-  hem_client = nil
 
   if all_ok
     if !QUIET
       puts "---------refreshing the HEM client----------------------"
       puts " "
     end
+    hem_client = nil
   else
     if !QUIET
       puts "something wierd is going on, so we have a little nap for #{SLEEPY_TIME} seconds"
-      if !QUIET 
+      if !QUIET
         sleep(SLEEPY_TIME)
       end
     end
