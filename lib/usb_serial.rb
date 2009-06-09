@@ -17,10 +17,9 @@ DEVICE_PATHS = [USB0, USB1, USB2, USB3]
 
 BAUDRATE = Termios::B115200
 
-SERIAL_TRY = 2000
-SERIAL_TIMEOUT = 1
-SERIAL_WAIT = 0.002 # seconds
-SERIAL_TIMEOUT_TRY = 3
+SERIAL_TIMEOUT = 3 # seconds
+SERIAL_WAIT = 0.5 # seconds
+SERIAL_TRY = 1 # second
 
 module UsbSerial
 
@@ -59,6 +58,9 @@ module UsbSerial
       begin
         self.serial_connections.each do |connection|
           beating = connection.check_beating
+          if !beating
+            connection = nil
+          end
         end
       rescue
         beating = false
@@ -75,6 +77,7 @@ module UsbSerial
   
   class UsbSerial::Connection
     attr_accessor :serial_connection
+    attr_accessor :usb_port
     attr_accessor :name
     attr_accessor :status
     attr_accessor :device
@@ -86,17 +89,17 @@ module UsbSerial
       @name = "unknown"
       @status = "unknown"
       @buffer = nil
+      @usb_port = nil
 
       @device = nil
     end
-
-    
 
     def connection_open(path)
       begin
         self.serial_connection = open(path, File::RDWR | File::NONBLOCK)
         mode = self.serial_connection.fcntl(Fcntl::F_GETFL, 0)
         self.serial_connection.fcntl(Fcntl::F_SETFL, mode & ~File::NONBLOCK)
+        self.usb_port = path
         return self.serial_connection
       rescue
         return nil
@@ -105,67 +108,84 @@ module UsbSerial
 
     def check_beating
       #TODO
-      # this will listen on the connection's heartbeat
-      # and workout wether it should be added
-      self.name = "switch_001"
-      self.status = "Active"
+      # this will listen on the connection's heartbeat to work out its controllerName
+      heartbeat = false
+      serial_data = serial_trx
 
-      return true
+      self.name = get_element("controllerName:", serial_data)
+      puts self.name if !QUIET && WHINY
+      if self.name != nil && self.name != ""
+        heartbeat = true
+        self.status = "Active"
+        puts "...heartbeat on #{self.usb_port} identifies: #{self.name}" if !QUIET && WHINY
+      end
+      
+      return heartbeat
     end
 
     def serial_trx(command=nil)
-      # sends and recieves serial data, and return the parsed sexpression
+      # sends and recieves serial data, and returns an array of parsed sexpressions
       count = 0
-      while count < SERIAL_TIMEOUT_TRY do
-        sexp = nil
-        success = false
-        result = nil
+      serial_output = nil
+      output = nil
+      
+      while count < SERIAL_TRY do
         begin
           begin
             Timeout::timeout(SERIAL_TIMEOUT) do
               if command != nil
-                self.serial_connection.puts command
-                sleep 0.005
+                self.serial_connection.puts "#{command};"
+                sleep SERIAL_WAIT
               end
-              sexp = self.serial_connection.gets
+              while !self.serial_connection.eof
+                serial_output = Array.new if !serial_output
+                serial_feed = self.serial_connection.gets
+                puts "...fresh from serial: #{serial_feed}" if !QUIET && WHINY && NEEDY
+                serial_output << serial_feed
+              end
             end
           rescue Timeout::Error
-            if count > SERIAL_TIMEOUT_TRY
-              puts "...serial connection timeout count limit reached, and exiting."  if !QUIET
-              break
-            end
+            puts "...serial connection has finished it's alloted read time."  if !QUIET && WHINY
           end
         rescue
-          sexp = nil
+          serial_output = nil
         end
-        begin
-          if sexp != nil
-            result = parse_sexp(sexp)
-            if result != nil
-              success = true
-              break
-            end
-          end
-        rescue
-          puts "...the program became upset parsing the s-expression: #{sexp} on attempt #{count}." if !QUIET
-        end
-        # puts "serial try #{count}"
         count += 1
+        # we reach here when nothing was found...
+        puts "...serial transaction read count: #{count}." if !QUIET
       end
-      # we reach here when nothing was found...
-      puts "...exited serial transaction on count: #{count}." if !QUIET
-      return result if success
-      return nil
+
+      # Now parse the sexps
+      output = parse_sexp(serial_output)
+
+      return output
     end
 
-    def parse_sexp(sexp)
-      result = nil
-      if sexp != nil &&  sexp != ""
-        puts "...got sexp: #{sexp} and about to parse" if !QUIET && WHINY
-        result = SExpression.parse(sexp)
+    def parse_sexp(serial_output)
+      output = nil
+      serial_output.each do |sexp|
+        begin
+          if sexp != nil &&  sexp != ""
+            puts "...got sexp: #{sexp} and about to parse" if !QUIET && WHINY && NEEDY
+            output = Array.new if !output
+            parsed_sexp = SExpression.parse(sexp)
+            output << parsed_sexp
+          end
+        rescue
+          puts "crud s-expression found: #{sexp} and skipped"
+        end
       end
-      return result if result.size > 0
-      return false
+      return output
+    end
+
+    def get_element(name, elements)
+      output = nil
+      elements.each do |element|
+        if element[0] == name
+          output = element[1]
+        end
+      end
+      return output
     end
 
     def print_sexp(sexp)

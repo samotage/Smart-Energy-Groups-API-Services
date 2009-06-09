@@ -32,8 +32,8 @@ STRAM_WAIT = 1
 COMMAND_TRY = 3
 COMMAND_WAIT = 1
 
-HIGH = "H"
-LOW = "L"
+ON = "(relay= on)"
+OFF = "(relay= off)"
 
 DEFAULT_SITE_TOKEN = "site_42121f21b26e7adf0dece67f356090b07167f93a"
 
@@ -83,9 +83,27 @@ module HemClient
           connections_assigned = self.site.assign_connections(self.serial_connections)
 
           # Do the stuff, first up synch!
-          synch_ok = self.site.synch_energisation
+         synch_ok = self.site.synch_energisation
+    #
+    #     
           # got_data = acquire_site_data(self.site_working)
+
           puts "-------Synch failed" if !QUIET && WHINY && !synch_ok
+
+
+   #       got_data = self.site.acquire_site_data
+
+          # commands_ok = self.site.execute_commands
+
+          if !QUIET && WHINY && commands_ok
+            puts "  "
+            puts "-------Executed Commands #{count}---------------------------------"
+          end
+
+          if !QUIET && WHINY && got_data && commands_ok
+            puts "Nothing to do on loop: #{count}"
+          end
+
           self.site = self.site.put_site
           if self.site
             puts "Acquired data sent to HEM" if !QUIET && WHINY

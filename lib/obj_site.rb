@@ -56,16 +56,12 @@ module ObjSite
     end
 
 
-    def acquire_site_data(site)
+    def acquire_site_data
       # go thorugh each site's devices and poll data for each of the streams...
+      #TODO make the success flag fail on failure of any child
       acquired_data = false
-      site.devices.each do |device|
-        device.streams.each do |stream|
-
-          if stream.parameter != nil && stream.parameter != ""
-            acquired_data = poll_device_stream(stream)
-          end
-        end
+      self.devices.each do |device|
+        acquired_data = device.acquire_data
       end
       return acquired_data
     end

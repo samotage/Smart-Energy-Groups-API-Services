@@ -28,6 +28,17 @@ module ObjDevice
       @streams = Array.new
       @commands = Array.new
     end
+    
+    def acquire_data
+      acquired_data = false
+      #TODO make fail on the fail of any single stream
+      if self.serial_connection != nil
+        self.streams.each do |stream|
+          acquired_data = stream.poll_data(self.serial_connection)
+        end
+      end
+      return acquired_data
+    end
 
     def assign_connection(connections)
       assigned = false
@@ -43,13 +54,13 @@ module ObjDevice
     end
 
     def synch_energisation
-      synch_ok = false
+      synch_ok = true
       if self.switchable == "true"
         case self.status
         when "Active"
-          synch_ok = self.execute_switch(HIGH)
+          synch_ok = self.execute_switch(ON)
         when "Inactive"
-          synch_ok = self.execute_switch(LOW)
+          synch_ok = self.execute_switch(OFF)
         else
           synch_ok = true
         end
@@ -66,9 +77,9 @@ module ObjDevice
           puts "about to execute command: #{command.command_type} on device: #{self.serial_num}"
           case command.command_type
           when "switch_on"
-            execute_ok = self.execute_switch(HIGH, command)
+            execute_ok = self.execute_switch(ON, command)
           when "switch_off"
-            execute_ok = self.execute_switch(LOW, command)
+            execute_ok = self.execute_switch(OFF, command)
           else
           end
         end

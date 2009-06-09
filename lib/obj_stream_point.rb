@@ -10,6 +10,15 @@ module ObjStreamPoint
       @point_date = nil
       @value = nil
     end
+
+    def StreamPoint.make_point(value)
+      point = ObjStreamPoint::StreamPoint.new
+
+      point.point_date = Time.now
+      point.value = value
+
+      return point
+    end
   end
 end
 

@@ -5,10 +5,11 @@
 require 'hem_client'
 
 SERVER_TIMEOUT = 5 # seconds
-SLEEPY_TIME = 10 # seconds
+SLEEPY_TIME = 5 # seconds
 
 QUIET = false # if true, no output to screen.
 WHINY = true  # if true, and not quiet, verbose output - otherwise minimal output.
+NEEDY = true  # if true, it's like that.
 
 while true do
   all_ok = false

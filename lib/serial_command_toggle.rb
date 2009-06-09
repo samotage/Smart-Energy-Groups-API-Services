@@ -21,9 +21,11 @@ BAUDRATE = Termios::B115200
 
 
 def put_now?(count)
-  return true if count.divmod(1).last == 0
+  return true if count.divmod(10000).last == 0
   return false
 end
+
+
 
 def dev_open(path)
   dev = open(path, File::RDWR | File::NONBLOCK)
@@ -48,6 +50,9 @@ rescue
   end
 end
 
+# tio = Termios.tcgetattr(cereal)
+# tio.ispeed = tio.ospeed = 115200
+# Termios.tcsetattr(cereal, Termios::TCSANOW, tio)
 
 count = 0
 max_count = 10000000
@@ -57,32 +62,29 @@ command = "H"
 while count < max_count do
 
 
-    if put_now?(count)
-      if toggle
-        puts ""
-        puts "--------------"
-        puts "turning off"
-        cereal.puts "(relay= off);"
-        toggle = false
-      else
-        puts ""
-        puts "--------------"
-        puts "turning on"
-        cereal.puts "(relay= on);"
-        toggle = true
-      end
-      sleep 0.5
+  if put_now?(count)
+    
+    if toggle
+      puts ""
+      puts "--------------"
+      puts "turning off"
+      cereal.puts "L"
+      toggle = false
+    else
+      puts ""
+      puts "--------------"
+      puts "turning on"
+      cereal.puts("H")
+      toggle = true
     end
 
-  while !cereal.eof
-    sexp = cereal.gets
-    read_sexp(sexp)
+    
   end
-  
-  puts "...about to sleep"
-  sleep 5
 
+  sexp = cereal.gets
+  read_sexp(sexp)
 
+  sleep 0.001
 
   count += 1
 end
