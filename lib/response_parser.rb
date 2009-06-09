@@ -95,6 +95,7 @@ module ResponseParser
                   stream.updated_at = stream_element.css('updated_at').first.content
                   stream.stream_type = stream_element.css('stream_type').first.content
                   stream.unit_type = stream_element.css('unit_type').first.content
+                  stream.aggregation_rule = stream_element.css('aggregation_rule').first.content
 
                   device.streams << stream
                 end

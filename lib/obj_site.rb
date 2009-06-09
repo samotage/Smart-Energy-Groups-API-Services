@@ -56,7 +56,7 @@ module ObjSite
     end
 
 
-    def acquire_site_data
+    def acquire_data
       # go thorugh each site's devices and poll data for each of the streams...
       #TODO make the success flag fail on failure of any child
       acquired_data = false

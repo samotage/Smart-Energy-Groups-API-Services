@@ -112,7 +112,7 @@ module UsbSerial
       heartbeat = false
       serial_data = serial_trx
 
-      self.name = get_element("controllerName:", serial_data)
+      self.name = get_value("controllerName:", serial_data)
       puts self.name if !QUIET && WHINY
       if self.name != nil && self.name != ""
         heartbeat = true
@@ -178,7 +178,8 @@ module UsbSerial
       return output
     end
 
-    def get_element(name, elements)
+    def get_value(name, elements)
+      #returns a single value for a given name from an array of elements
       output = nil
       elements.each do |element|
         if element[0] == name
@@ -187,6 +188,21 @@ module UsbSerial
       end
       return output
     end
+
+    def get_values(name, elements)
+      #returns a single value for a given name from an array of elements
+      output = nil
+      elements.each do |element|
+        if element[0] == name
+          output = Array.new if !output
+          output << element[1]
+        end
+      end
+      return output
+    end
+
+
+
 
     def print_sexp(sexp)
       if sexp != nil &&  sexp != ""

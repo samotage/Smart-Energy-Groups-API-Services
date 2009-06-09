@@ -8,6 +8,7 @@ module ObjStream
     attr_accessor :stream_type
     attr_accessor :unit_type
     attr_accessor :parameter
+    attr_accessor :aggregation_rule
 
     attr_accessor :device
     attr_accessor :points
@@ -20,6 +21,7 @@ module ObjStream
       @stream_type = nil
       @unit_type = nil
       @parameter = nil
+      @aggregation_rule = nil
 
       @points = Array.new
     end
@@ -37,9 +39,12 @@ module ObjStream
             if !QUIET && WHINY
               puts "about to get sexp, count: #{count}"
             end
-            value = serial.serial_trx
-            if value != nil
-              acquired_data = add_stream_point(value)
+            fresh_data = serial.serial_trx
+
+            if fresh_data
+              values = serial.get_values(self.parameter, fresh_data)
+              acquired_data = process_data(values)
+              
               break if acquired_data
             end
           rescue
@@ -57,24 +62,45 @@ module ObjStream
       return acquired_data
     end
 
-    def add_stream_point(value)
-      added_point = false
-      if value != nil
-        if value[0] == self.parameter
-          if value[1] != nil
+    def process_data(fresh_data)
+      value = nil
 
-            stream_point = ObjStreamPoint::StreamPoint.make_point(value[1].to_s)
-            stream_point.stream = self
-
-            if self.points == nil
-              self.points = Array.new
-            end
-            self.points << stream_point
-            added_point = true
-            puts "...acquired: #{stream.parameter} #{value} at #{stream_point.point_date.strftime("%Y-%m-%d %H:%M:%S")}" if !QUIET
-          end
+      fresh_data.each do |this_value|
+        case self.aggregation_rule
+        when "average"
+          value = 0 if !value
+          value += this_value.to_f
+        when "sum"
+          value = 0 if !value
+          value += this_value.to_f
         end
       end
+
+      if self.aggregation_rule == "average"
+        # work out the average
+        average_div = fresh_data.size
+        if value != nil && average_div != nil && average_div > 0
+          #avoid div zero...
+          average = value/average_div
+          value = average
+        end
+      end
+      acquired_data = add_stream_point(value)
+
+      return acquired_data
+    end
+
+    def add_stream_point(value)
+      added_point = false
+      stream_point = ObjStreamPoint::StreamPoint.make_point(value.to_s)
+      stream_point.stream = self
+
+      if self.points == nil
+        self.points = Array.new
+      end
+      self.points << stream_point
+      added_point = true
+      puts "...acquired: #{self.parameter} #{value} at #{stream_point.point_date.strftime("%Y-%m-%d %H:%M:%S")}" if !QUIET
       return added_point
     end
   end

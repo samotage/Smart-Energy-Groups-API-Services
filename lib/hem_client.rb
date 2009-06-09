@@ -83,15 +83,11 @@ module HemClient
           connections_assigned = self.site.assign_connections(self.serial_connections)
 
           # Do the stuff, first up synch!
-         synch_ok = self.site.synch_energisation
-    #
-    #     
-          # got_data = acquire_site_data(self.site_working)
-
+          synch_ok = self.site.synch_energisation
           puts "-------Synch failed" if !QUIET && WHINY && !synch_ok
 
 
-   #       got_data = self.site.acquire_site_data
+          got_data = self.site.acquire_data
 
           # commands_ok = self.site.execute_commands
 
