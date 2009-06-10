@@ -17,9 +17,12 @@ DEVICE_PATHS = [USB0, USB1, USB2, USB3]
 
 BAUDRATE = Termios::B115200
 
-SERIAL_TIMEOUT = 3 # seconds
-SERIAL_WAIT = 0.5 # seconds
-SERIAL_TRY = 1 # second
+#SERIAL_TIMEOUT = 500 # seconds
+SERIAL_TIMEOUT = 5 # seconds
+SERIAL_WAIT = 0.2 # seconds
+SERIAL_TRY = 1
+
+DEVICE_PARAMETER = "controllerName:"
 
 module UsbSerial
 
@@ -38,14 +41,14 @@ module UsbSerial
         begin
           connection = UsbSerial::Connection.new
           connection.serial_connection = connection.connection_open(path)
+          
           if connection.serial_connection != nil
             connections.serial_connections << connection
-            puts "" if !QUIET
             puts "Connected to device on path: #{path}" if !QUIET
             count += 1
           end
         rescue
-          puts "Fail to connect on device on path: #{path}" if !QUIET
+          # puts "Fail to connect on device on path: #{path}" if !QUIET
         end
       end
 
@@ -54,6 +57,7 @@ module UsbSerial
     end
 
     def check_all_beating
+      #TODO make a better beating check
       beating = true
       begin
         self.serial_connections.each do |connection|
@@ -95,35 +99,69 @@ module UsbSerial
     end
 
     def connection_open(path)
+
+      self.serial_connection = connection_init(path)
+
+      self.serial_connection.extend Termios
+
+      newtio = Termios::new_termios()
+
+#  The following below here makes the serial connection useless...
+#      newtio.iflag = Termios::IGNPAR
+#      newtio.oflag = 0
+#      newtio.cflag = (Termios::CRTSCTS | Termios::CS8 | Termios::CREAD)
+#      newtio.lflag = 0
+#      newtio.cc[Termios::VTIME] = 0
+#      newtio.cc[Termios::VMIN] = 1
+      newtio.ispeed = BAUDRATE
+      newtio.ospeed = BAUDRATE
+
+      Termios::tcflush(self.serial_connection, Termios::TCIOFLUSH)
+      Termios::tcsetattr(self.serial_connection, Termios::TCSANOW, newtio)
+
+      return self.serial_connection
+    end
+
+    def connection_flush
+      Termios::tcflush(self.serial_connection, Termios::TCIOFLUSH)
+    end
+
+
+    def connection_init(path)
+      self.serial_connection = nil
       begin
+        self.usb_port = path
         self.serial_connection = open(path, File::RDWR | File::NONBLOCK)
         mode = self.serial_connection.fcntl(Fcntl::F_GETFL, 0)
         self.serial_connection.fcntl(Fcntl::F_SETFL, mode & ~File::NONBLOCK)
-        self.usb_port = path
-        return self.serial_connection
       rescue
-        return nil
+        self.serial_connection = nil
       end
+      return self.serial_connection
     end
 
     def check_beating
-      #TODO
-      # this will listen on the connection's heartbeat to work out its controllerName
       heartbeat = false
-      serial_data = serial_trx
+      return_first = true
+      puts "looking for heartbeat on #{self.usb_port}..." if !QUIET && WHINY
 
-      self.name = get_value("controllerName:", serial_data)
-      puts self.name if !QUIET && WHINY
-      if self.name != nil && self.name != ""
-        heartbeat = true
-        self.status = "Active"
-        puts "...heartbeat on #{self.usb_port} identifies: #{self.name}" if !QUIET && WHINY
+      serial_data = self.serial_trx(nil, return_first)
+
+      #TODO Make this retry if nothing useful found
+      if serial_data
+        self.name = get_value(DEVICE_PARAMETER, serial_data)
+        puts self.name if !QUIET && WHINY
+        if self.name != nil && self.name != ""
+          heartbeat = true
+          self.status = "Active"
+          puts "...heartbeat on #{self.usb_port} identifies: #{self.name}" if !QUIET && WHINY
+        end
       end
       
       return heartbeat
     end
 
-    def serial_trx(command=nil)
+    def serial_trx(command=nil, return_first=nil)
       # sends and recieves serial data, and returns an array of parsed sexpressions
       count = 0
       serial_output = nil
@@ -133,40 +171,55 @@ module UsbSerial
         begin
           begin
             Timeout::timeout(SERIAL_TIMEOUT) do
+
               if command != nil
-                self.serial_connection.puts "#{command};"
-                sleep SERIAL_WAIT
+                puts "...serial trx...about to send serial command: #{command}"
+                self.serial_connection.puts command
+                sleep 0.01
               end
               while !self.serial_connection.eof
                 serial_output = Array.new if !serial_output
                 serial_feed = self.serial_connection.gets
-                puts "...fresh from serial: #{serial_feed}" if !QUIET && WHINY && NEEDY
+                puts "...serial trx...fresh serial: #{serial_feed}" if !QUIET && WHINY && NEEDY
+
                 serial_output << serial_feed
+
+                if return_first
+                  break
+                end
               end
             end
           rescue Timeout::Error
-            puts "...serial connection has finished it's alloted read time."  if !QUIET && WHINY
+            puts "...serial trx...serial connection has finished it's alloted read time."  if !QUIET && WHINY
           end
         rescue
           serial_output = nil
         end
         count += 1
         # we reach here when nothing was found...
-        puts "...serial transaction read count: #{count}." if !QUIET
+        puts "...serial trx...serial transaction read count: #{count}." if !QUIET
       end
 
       # Now parse the sexps
       output = parse_sexp(serial_output)
+      if output != nil
+        puts "...serial trx...serial transaction read count: #{count}." if !QUIET
+      end
 
       return output
     end
+
+    def write_serial
+
+    end
+    
 
     def parse_sexp(serial_output)
       output = nil
       serial_output.each do |sexp|
         begin
           if sexp != nil &&  sexp != ""
-            puts "...got sexp: #{sexp} and about to parse" if !QUIET && WHINY && NEEDY
+            puts "...parsing raw s-exp: #{sexp}" if !QUIET && WHINY && NEEDY
             output = Array.new if !output
             parsed_sexp = SExpression.parse(sexp)
             output << parsed_sexp
@@ -201,14 +254,13 @@ module UsbSerial
       return output
     end
 
-
-
-
     def print_sexp(sexp)
       if sexp != nil &&  sexp != ""
         puts sexp
       end
     end
+
+    
   end
 end
 

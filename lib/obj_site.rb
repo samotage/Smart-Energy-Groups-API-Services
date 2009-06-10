@@ -24,22 +24,28 @@ module ObjSite
     end
 
     def assign_connections(serial_connections)
-      assigned = true
+      assigned = false
       self.devices.each do |device|
-        assigned = device.assign_connection(serial_connections)
+        this_assigned = device.assign_connection(serial_connections)
+        
+        if !assigned && this_assigned
+          # we assign success even if only one has made it.
+          assigned = true
+        end
+
       end
       return assigned
     end
 
     def synch_energisation
       synch_ok = false
-
       self.devices.each do |device|
-        #TODO Make this set fail if any of them fail...
-        
-        synch_ok = device.synch_energisation
+        this_synch_ok = device.synch_energisation
+        if !synch_ok && this_synch_ok
+          # we assign success even if only one has made it.
+          synch_ok = true
+        end
       end
-
       return synch_ok
     end
 

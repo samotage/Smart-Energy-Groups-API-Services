@@ -43,8 +43,10 @@ module ObjStream
 
             if fresh_data
               values = serial.get_values(self.parameter, fresh_data)
-              acquired_data = process_data(values)
               
+              if values != nil && values.size > 0
+                acquired_data = process_data(values)
+              end
               break if acquired_data
             end
           rescue

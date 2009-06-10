@@ -96,9 +96,9 @@ module ObjDevice
         while count < COMMAND_TRY do
           result = nil
           begin
-            puts "about to send on serial value: #{value}" if !QUIET && WHINY
+            puts "device about to execute switch" if !QUIET && WHINY
 
-            result = self.serial_connection.serial_trx(value)
+            result = self.serial_connection.serial_trx(value, true)
             if result != nil
               if command != nil
                 commanded = process_command_result(command, result)
