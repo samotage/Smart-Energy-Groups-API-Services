@@ -148,7 +148,7 @@ module BuildApiSites
                 if !make_data
                   # We send what's givn from parameters
                   xml.point do
-                    xml.date_time date_time.strftime("%Y-%m-%d %H:%M:%S")
+                    xml.point_date date_time.strftime("%Y-%m-%d %H:%M:%S")
                     xml.value point_value
                   end
                 else
@@ -158,7 +158,7 @@ module BuildApiSites
                       # Add 30 mins in seconds.
 
                       date_time = date_time + (60 * increment)
-                      xml.date_time date_time.strftime("%Y-%m-%d %H:%M:%S")
+                      xml.point_date date_time.strftime("%Y-%m-%d %H:%M:%S")
 
                       data = Math.sin(i)
                       data = data * 100

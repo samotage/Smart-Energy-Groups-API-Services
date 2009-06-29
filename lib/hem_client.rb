@@ -19,7 +19,7 @@ require "response_parser"
 require "log_outputs"
 
 SERVER_TIMEOUT = 5 # seconds
-MAIN_LOOP_COUNT = 1
+MAIN_LOOP_COUNT = 10
 
 HEM_COUNT = 10
 HEM_WAIT = 3
@@ -83,6 +83,7 @@ module HemClient
           # connections need to be asssigned on each loop, as there is a new site each time!
 
           connections_assigned = self.site.assign_connections(self.serial_connections)
+
            if !connections_assigned
              puts "trouble occured assigning serial connections, and exiting" if !QUIET
              return nil
@@ -93,8 +94,8 @@ module HemClient
             # Do the stuff, first up synch!
             synch_ok = self.site.synch_energisation
 
-            puts "-------Synch failed" if !QUIET && WHINY && !synch_ok
-            puts "-------Synch Ok" if !QUIET && WHINY && synch_ok
+            puts "Synch failed" if !QUIET && WHINY && !synch_ok
+            puts "Synch Ok" if !QUIET && WHINY && synch_ok
 
             got_data = self.site.acquire_data
 
@@ -102,10 +103,10 @@ module HemClient
 
             if !QUIET && WHINY && commands_ok
               puts "  "
-              puts "-------Executed Commands #{count}---------------------------------"
+              puts "Executed Commands #{count}---------------------------------"
             end
 
-            if got_data
+       #     if got_data
               self.site = self.site.put_site
               if self.site
                 puts "Acquired data sent to HEM" if !QUIET && WHINY
@@ -117,10 +118,10 @@ module HemClient
                 puts "Something failed sending acquired data to HEM" if !QUIET
                 sleep SERVER_TIMEOUT
               end
-            else
-              puts "This loop: #{count} has nothing to send to HEM"
-              sleep SERVER_TIMEOUT
-            end
+#            else
+#              puts "This loop: #{count} has nothing to send to HEM"
+#              sleep SERVER_TIMEOUT
+#            end
           else
             # lets kill connections
             puts "serial connections not assigned, resetting before a retry" if !QUIET

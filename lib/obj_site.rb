@@ -64,10 +64,12 @@ module ObjSite
 
     def acquire_data
       # go thorugh each site's devices and poll data for each of the streams...
-      #TODO make the success flag fail on failure of any child
       acquired_data = false
       self.devices.each do |device|
-        acquired_data = device.acquire_data
+        this_acquired_data = device.acquire_data
+        if !acquired_data && this_acquired_data
+          acquired_data = true
+        end
       end
       return acquired_data
     end

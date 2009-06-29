@@ -14,13 +14,7 @@ require "log_outputs"
 #
 # So test away as you please, and you can incorporate these method calls within your ruby project.
 #
-# Note you WILL need to get your site key, available within HEM when you edit your site.
 #
-
-
-
-# The following has a token for my site, so please be careful - and it is subject to change ;)
-
 
 xml = BuildApiSites.make_put_xml(
   :site_token => "site_5a8b9b4ba4bb7adee7cec91450a4cdd099e5f208",
