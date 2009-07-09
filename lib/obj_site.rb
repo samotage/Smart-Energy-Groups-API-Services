@@ -31,6 +31,8 @@ module ObjSite
         if !assigned && this_assigned
           # we assign success even if only one has made it.
           assigned = true
+        else
+          puts "...could not map a serial connection to Device: #{device.serial_num}"  if !QUIET
         end
 
       end
@@ -96,9 +98,7 @@ module ObjSite
               end
             end
           rescue Timeout::Error
-            if !QUIET
-              puts "...timeout in HEM Get command, attempt count: #{try_count}"
-            end
+            puts "...timeout in HEM Get command, attempt count: #{try_count}"  if !QUIET
           end
           if response != nil
             site = ResponseParser.api_sites_xml(
@@ -108,9 +108,7 @@ module ObjSite
             break if site
           end
         rescue
-          if !QUIET
-            puts "...call to get site from HEM failed, attempt count: #{try_count}"
-          end
+          puts "...call to get site from HEM failed, attempt count: #{try_count}" if !QUIET
         end
         if !QUIET && WHINY
           puts "...trying again to :get site from HEM, attempt count: #{try_count}"

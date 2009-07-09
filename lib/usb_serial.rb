@@ -61,6 +61,7 @@ module UsbSerial
       beating = true
       begin
         self.serial_connections.each do |connection|
+          puts ".about to check heartbeat on: #{connection.usb_port}" if !QUIET
           beating = connection.check_beating
           if !beating
             connection = nil
@@ -105,14 +106,6 @@ module UsbSerial
       self.serial_connection.extend Termios
 
       newtio = Termios::new_termios()
-
-#  The following below here makes the serial connection useless...
-#      newtio.iflag = Termios::IGNPAR
-#      newtio.oflag = 0
-#      newtio.cflag = (Termios::CRTSCTS | Termios::CS8 | Termios::CREAD)
-#      newtio.lflag = 0
-#      newtio.cc[Termios::VTIME] = 0
-#      newtio.cc[Termios::VMIN] = 1
       newtio.ispeed = BAUDRATE
       newtio.ospeed = BAUDRATE
 
@@ -123,7 +116,7 @@ module UsbSerial
     end
 
     def connection_flush
-      Termios::tcflush(self.serial_connection, Termios::TCIOFLUSH)
+      # Termios::tcflush(self.serial_connection, Termios::TCIOFLUSH)
     end
 
 
@@ -143,18 +136,17 @@ module UsbSerial
     def check_beating
       heartbeat = false
       return_first = true
-      puts "looking for heartbeat on #{self.usb_port}..." if !QUIET && WHINY
+      puts "..looking for heartbeat on #{self.usb_port}..." if !QUIET
 
       serial_data = self.serial_trx(nil, return_first)
 
       #TODO Make this retry if nothing useful found
       if serial_data
         self.name = get_value(DEVICE_PARAMETER, serial_data)
-        puts self.name if !QUIET && WHINY
         if self.name != nil && self.name != ""
           heartbeat = true
           self.status = "Active"
-          puts "...heartbeat on #{self.usb_port} identifies: #{self.name}" if !QUIET && WHINY
+          puts "...found heartbeat on #{self.usb_port} identifies: #{self.name}" if !QUIET && WHINY
         end
       end
       

@@ -7,11 +7,11 @@ require 'hem_client'
 
 SLEEPY_TIME = 5 # seconds
 
-IS_PROD = true # sets where the API points
+IS_PROD = false # sets where the API points
 
 QUIET = false # if true, no output to screen.
-WHINY = false  # if true, and not quiet, verbose output - otherwise minimal output.
-NEEDY = false  # if true, it's like that.
+WHINY = true  # if true, and not quiet, verbose output - otherwise minimal output.
+NEEDY = true  # if true, it's like that.
 
 while true do
   all_ok = false
@@ -24,7 +24,7 @@ while true do
 
     if !all_ok
       if !QUIET
-        puts "...the client returned not ok, returning nil"
+        puts "Back in main after the client returned FAIL..."
       end
     end
   rescue

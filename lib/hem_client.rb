@@ -85,7 +85,7 @@ module HemClient
           connections_assigned = self.site.assign_connections(self.serial_connections)
 
            if !connections_assigned
-             puts "trouble occured assigning serial connections, and exiting" if !QUIET
+             puts "Serial connections could not be assigned to Energy manager devices - and exiting" if !QUIET
              return nil
            end
 

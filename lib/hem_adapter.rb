@@ -16,7 +16,8 @@ module HemAdapter
 
     # default ports for the api
 
-    host = "api.smartenergygroups.com"
+    #host = "api.smartenergygroups.com"
+    host = "test.opngrid.com"
     port = 80
     
     args.first.each do |key, value|
@@ -56,6 +57,8 @@ module HemAdapter
 
       when :post
         # Set the form data with options
+        # command << "?" + options.map{|k,v| "#{k}=#{v}" }.join('&')
+        command
         req = Net::HTTP::Post.new(command)
         req.set_form_data(options)
 
