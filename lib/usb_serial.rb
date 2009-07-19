@@ -22,7 +22,7 @@ SERIAL_TIMEOUT = 5 # seconds
 SERIAL_WAIT = 0.2 # seconds
 SERIAL_TRY = 1
 
-DEVICE_PARAMETER = "controllerName:"
+DEVICE_PARAMETER = "nodeName="
 
 module UsbSerial
 

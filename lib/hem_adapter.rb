@@ -16,8 +16,7 @@ module HemAdapter
 
     # default ports for the api
 
-    #host = "api.smartenergygroups.com"
-    host = "test.opngrid.com"
+    host = "api.smartenergygroups.com"
     port = 80
     
     args.first.each do |key, value|

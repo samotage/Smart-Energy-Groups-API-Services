@@ -7,7 +7,7 @@ require 'hem_client'
 
 SLEEPY_TIME = 5 # seconds
 
-IS_PROD = false # sets where the API points
+IS_PROD = true # sets where the API points
 
 QUIET = false # if true, no output to screen.
 WHINY = true  # if true, and not quiet, verbose output - otherwise minimal output.

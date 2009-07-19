@@ -26,13 +26,17 @@ module ObjSite
     def assign_connections(serial_connections)
       assigned = false
       self.devices.each do |device|
+
+        puts "..looking for serial connection for Device: #{device.serial_num}"  if !QUIET
+
         this_assigned = device.assign_connection(serial_connections)
-        
+
         if !assigned && this_assigned
           # we assign success even if only one has made it.
           assigned = true
+          puts "....mapped serial connection to Device: #{device.serial_num}"  if !QUIET
         else
-          puts "...could not map a serial connection to Device: #{device.serial_num}"  if !QUIET
+          puts "....could not map a serial connection to Device: #{device.serial_num}"  if !QUIET
         end
 
       end

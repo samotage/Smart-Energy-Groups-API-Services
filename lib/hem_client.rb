@@ -30,8 +30,8 @@ STRAM_WAIT = 1
 COMMAND_TRY = 3
 COMMAND_WAIT = 1
 
-ON = "H"
-OFF = "L"
+ON = "relay=on"
+OFF = "relay=off"
 
 DEFAULT_SITE_TOKEN = "site_42121f21b26e7adf0dece67f356090b07167f93a"
 
