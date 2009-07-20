@@ -33,8 +33,15 @@ module ObjDevice
       acquired_data = false
       #TODO make fail on the fail of any single stream
       if self.serial_connection != nil
-        self.streams.each do |stream|
-          acquired_data = stream.poll_data(self.serial_connection)
+
+        # Lets get some data for our serial connection
+        fresh_data = self.serial_connection.serial_trx
+
+        # now we have this, lets process it into the streams
+        if !fresh_data
+          self.streams.each do |stream|
+            acquired_data = stream.consume_data(self.serial_connection)
+          end
         end
       end
       return acquired_data

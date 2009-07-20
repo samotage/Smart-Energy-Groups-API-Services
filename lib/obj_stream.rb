@@ -34,7 +34,6 @@ module ObjStream
         # we are looking for s expressions on the serial feed that match our stream's parameter
 
         while count < STREAM_TRY do
-          value = nil
           begin
             if !QUIET && WHINY
               puts "about to get sexp, count: #{count}"
@@ -62,6 +61,30 @@ module ObjStream
         end
       end
       return acquired_data
+    end
+
+    def consume_data(serial_connection)
+
+      #we get the data out of the data_array on the serial connection and put into the stream
+
+      begin
+        if !QUIET && WHINY
+          puts "....about process serial data into stream: #{self.external_id}"
+        end
+
+        if serial_connection
+          values = serial_connection.get_values(self.parameter)
+
+          if values != nil && values.size > 0
+            acquired_data = process_data(values)
+          end
+          break if acquired_data
+        end
+      rescue
+        if !QUIET
+          puts "....something failed aquiring stream data and adding point"
+        end
+      end
     end
 
     def process_data(fresh_data)

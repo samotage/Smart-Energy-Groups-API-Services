@@ -18,9 +18,9 @@ DEVICE_PATHS = [USB0, USB1, USB2, USB3]
 BAUDRATE = Termios::B115200
 
 #SERIAL_TIMEOUT = 500 # seconds
-SERIAL_TIMEOUT = 5 # seconds
+SERIAL_TIMEOUT = 6 # seconds
 SERIAL_WAIT = 0.2 # seconds
-SERIAL_TRY = 1
+SERIAL_TRY = 3
 
 DEVICE_PARAMETER = "nodeName="
 
@@ -61,9 +61,10 @@ module UsbSerial
       beating = true
       begin
         self.serial_connections.each do |connection|
-          puts ".about to check heartbeat on: #{connection.usb_port}" if !QUIET
+          puts "..about to check heartbeat on: #{connection.usb_port}" if !QUIET
           beating = connection.check_beating
           if !beating
+            puts puts "..no heartbeat on: #{connection.usb_port} and setting to nil" if !QUIET
             connection = nil
           end
         end
@@ -87,16 +88,18 @@ module UsbSerial
     attr_accessor :status
     attr_accessor :device
     
+    #Buffer is used to read in data from the connection.
     attr_accessor :buffer
+    attr_accessor :data_array
     
     def initialize
       @serial_connection = nil
       @name = "unknown"
       @status = "unknown"
-      @buffer = nil
       @usb_port = nil
-
       @device = nil
+      @buffer = nil
+      @data_array = nil
     end
 
     def connection_open(path)
@@ -136,7 +139,7 @@ module UsbSerial
     def check_beating
       heartbeat = false
       return_first = true
-      puts "..looking for heartbeat on #{self.usb_port}..." if !QUIET
+      puts "....looking for heartbeat on #{self.usb_port}..." if !QUIET
 
       serial_data = self.serial_trx(nil, return_first)
 
@@ -146,7 +149,7 @@ module UsbSerial
         if self.name != nil && self.name != ""
           heartbeat = true
           self.status = "Active"
-          puts "...found heartbeat on #{self.usb_port} identifies: #{self.name}" if !QUIET && WHINY
+          puts "....found heartbeat on #{self.usb_port} identifies: #{self.name}" if !QUIET && WHINY
         end
       end
       
@@ -156,8 +159,9 @@ module UsbSerial
     def serial_trx(command=nil, return_first=nil)
       # sends and recieves serial data, and returns an array of parsed sexpressions
       count = 0
-      serial_output = nil
-      output = nil
+      self.buffer = nil
+      self.buffer = Array.new
+      got_data = false
       
       while count < SERIAL_TRY do
         begin
@@ -165,53 +169,60 @@ module UsbSerial
             Timeout::timeout(SERIAL_TIMEOUT) do
 
               if command != nil
-                puts "...serial trx...about to send serial command: #{command}"
+                puts "..serial trx - about to send serial command: #{command}"
                 self.serial_connection.puts command
                 sleep 0.01
               end
               while !self.serial_connection.eof
-                serial_output = Array.new if !serial_output
+                serial_feed = nil
                 serial_feed = self.serial_connection.gets
-                puts "...serial trx...fresh serial: #{serial_feed}" if !QUIET && WHINY && NEEDY
 
-                serial_output << serial_feed
-
-                if return_first
-                  break
+                if serial_feed != nil
+                  serial_chop = serial_feed.chop
+                  if serial_chop != "" && serial_feed != "/n"
+                    puts "..serial trx - recieved fresh serial data: #{serial_chop}" if !QUIET && WHINY && NEEDY
+                    self.buffer << serial_chop
+                    got_data = true
+                    if return_first
+                      break
+                    end
+                  end
+                else
+                  puts "..serial trx - received empty data..." if !QUIET && WHINY && NEEDY
                 end
               end
             end
           rescue Timeout::Error
-            puts "...serial trx...serial connection has finished it's alloted read time."  if !QUIET && WHINY
+            puts "..serial trx - serial connection timeout."  if !QUIET && WHINY
           end
-        rescue
-          serial_output = nil
+        rescue SystemCallError
+          puts "..An exception occured reading serial data, and exiting: #{SystemCallError}"  if !QUIET && WHINY
         end
-        count += 1
-        # we reach here when nothing was found...
-        puts "...serial trx...serial transaction read count: #{count}." if !QUIET
+
+        if got_data
+          break
+        else
+          count += 1
+          # we reach here when nothing was found...
+          puts "..serial trx - reading count: #{count}." if !QUIET
+        end
       end
 
       # Now parse the sexps
-      output = parse_sexp(serial_output)
-      if output != nil
-        puts "...serial trx...serial transaction read count: #{count}." if !QUIET
+      self.data_array = parse_sexp(self.buffer)
+      if self.data_array != nil
+        puts "..serial trx - serial transaction read count: #{count}." if !QUIET
       end
 
-      return output
+      return self.data_array
     end
-
-    def write_serial
-
-    end
-    
 
     def parse_sexp(serial_output)
       output = nil
       serial_output.each do |sexp|
         begin
           if sexp != nil &&  sexp != ""
-            puts "...parsing raw s-exp: #{sexp}" if !QUIET && WHINY && NEEDY
+            puts "..parsing raw s-exp: #{sexp}" if !QUIET && WHINY && NEEDY
             output = Array.new if !output
             parsed_sexp = SExpression.parse(sexp)
             output << parsed_sexp
@@ -234,10 +245,10 @@ module UsbSerial
       return output
     end
 
-    def get_values(name, elements)
+    def get_values(name)
       #returns a single value for a given name from an array of elements
       output = nil
-      elements.each do |element|
+      self.data_array.each do |element|
         if element[0] == name
           output = Array.new if !output
           output << element[1]

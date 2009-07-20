@@ -19,7 +19,7 @@ require "response_parser"
 require "log_outputs"
 
 SERVER_TIMEOUT = 5 # seconds
-MAIN_LOOP_COUNT = 10
+MAIN_LOOP_COUNT = 100
 
 HEM_COUNT = 10
 HEM_WAIT = 3
@@ -30,8 +30,8 @@ STRAM_WAIT = 1
 COMMAND_TRY = 3
 COMMAND_WAIT = 1
 
-ON = "relay=on"
-OFF = "relay=off"
+ON = "(relay= on)"
+OFF = "(relay= off)"
 
 DEFAULT_SITE_TOKEN = "site_42121f21b26e7adf0dece67f356090b07167f93a"
 
