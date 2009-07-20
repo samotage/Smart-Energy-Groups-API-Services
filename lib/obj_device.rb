@@ -38,7 +38,7 @@ module ObjDevice
         fresh_data = self.serial_connection.serial_trx
 
         # now we have this, lets process it into the streams
-        if !fresh_data
+        if fresh_data
           self.streams.each do |stream|
             acquired_data = stream.consume_data(self.serial_connection)
           end

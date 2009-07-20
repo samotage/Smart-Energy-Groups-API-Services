@@ -78,7 +78,6 @@ module ObjStream
           if values != nil && values.size > 0
             acquired_data = process_data(values)
           end
-          break if acquired_data
         end
       rescue
         if !QUIET
