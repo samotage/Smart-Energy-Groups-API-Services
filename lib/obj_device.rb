@@ -103,7 +103,7 @@ module ObjDevice
         while count < COMMAND_TRY do
           result = nil
           begin
-            puts "device about to execute switch" if !QUIET && WHINY
+            puts "device: #{self.name} about to execute switch" if !QUIET && WHINY
 
             result = self.serial_connection.serial_trx(value, true)
             if result != nil
@@ -115,8 +115,9 @@ module ObjDevice
                 break
               end
             end
-          rescue
-            puts "...Boo. Something exploded tying to send the command." if !QUIET
+          rescue Exception => e
+            puts "..Something failed trying to execute the switch command: #{e.message}"
+            puts e.backtrace.inspect
           end
           if commanded
             break

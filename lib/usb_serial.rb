@@ -47,8 +47,8 @@ module UsbSerial
             puts "Connected to device on path: #{path}" if !QUIET
             count += 1
           end
-        rescue
-          # puts "Fail to connect on device on path: #{path}" if !QUIET
+        rescue Exception => e
+          puts "failed to connect on device on path: #{path} message: #{e.message}" if !QUIET
         end
       end
 
@@ -68,7 +68,8 @@ module UsbSerial
             connection = nil
           end
         end
-      rescue
+      rescue Exception => e
+        puts "....failed to check heartbeats message: #{e.message}" if !QUIET
         beating = false
       end
       return beating
@@ -130,7 +131,8 @@ module UsbSerial
         self.serial_connection = open(path, File::RDWR | File::NONBLOCK)
         mode = self.serial_connection.fcntl(Fcntl::F_GETFL, 0)
         self.serial_connection.fcntl(Fcntl::F_SETFL, mode & ~File::NONBLOCK)
-      rescue
+      rescue Exception => e
+        puts "....failed to open serial connection on path #{path} message: #{e.message}" if !QUIET
         self.serial_connection = nil
       end
       return self.serial_connection
@@ -195,8 +197,8 @@ module UsbSerial
           rescue Timeout::Error
             puts "..serial trx - serial connection timeout."  if !QUIET && WHINY
           end
-        rescue SystemCallError
-          puts "..An exception occured reading serial data, and exiting: #{SystemCallError}"  if !QUIET && WHINY
+        rescue Exception => e
+          puts "..nn exception occured reading serial data, and exiting: #{e.message}"  if !QUIET && WHINY
         end
 
         if got_data
@@ -227,8 +229,8 @@ module UsbSerial
             parsed_sexp = SExpression.parse(sexp)
             output << parsed_sexp
           end
-        rescue
-          puts "crud s-expression found: #{sexp} and skipped"
+        rescue Exception => e
+          puts "crud s-expression found: #{sexp} and skipped, message: #{e.message}"
         end
       end
       return output

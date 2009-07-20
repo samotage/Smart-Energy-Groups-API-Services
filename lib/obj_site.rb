@@ -111,8 +111,9 @@ module ObjSite
               :xml_body => response)
             break if site
           end
-        rescue
-          puts "...call to get site from HEM failed, attempt count: #{try_count}" if !QUIET
+        rescue Exception => e
+          puts "...call to get site from HEM failed, attempt count: #{try_count} message: #{e.message}" if !QUIET
+          puts e.backtrace.inspect
         end
         if !QUIET && WHINY
           puts "...trying again to :get site from HEM, attempt count: #{try_count}"
@@ -164,9 +165,10 @@ module ObjSite
               break
             end
           end
-        rescue
+        rescue Exception => e
           if !QUIET
-            puts "...call to get site from HEM failed, attempt count: #{try_count}"
+            puts "...call to get site from HEM failed, attempt count: #{try_count} message: #{e.message}"
+            puts e.backtrace.inspect
           end
         end
 

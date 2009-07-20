@@ -48,9 +48,10 @@ module ObjStream
               end
               break if acquired_data
             end
-          rescue
+          rescue Exception => e
             if !QUIET
-              puts "...something failed aquiring stream data and adding point"
+              puts "...something failed aquiring stream data and adding point, message: #{e.message}"
+              puts e.backtrace.inspect
             end
           end
           if !QUIET && WHINY
@@ -79,9 +80,10 @@ module ObjStream
             acquired_data = process_data(values)
           end
         end
-      rescue
+      rescue Exception => e
         if !QUIET
-          puts "....something failed aquiring stream data and adding point"
+          puts "....something failed aquiring stream data and adding point, message: #{e.message}"
+          puts e.backtrace.inspect
         end
       end
     end

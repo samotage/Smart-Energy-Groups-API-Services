@@ -27,7 +27,9 @@ while true do
         puts "Back in main after the client returned FAIL..."
       end
     end
-  rescue
+  rescue Exception => e
+    puts "Client rescued an error: #{e.message}"
+    puts e.backtrace.inspect
     all_ok = false
   end
 
