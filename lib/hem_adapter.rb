@@ -38,7 +38,8 @@ module HemAdapter
 
     begin
       if LOG_SCREEN
-        puts command
+        puts "Command URL;"
+        puts "http://" + host.to_s + ":" + port.to_s + command
       end
 
       http = Net::HTTP.new(host, port)
