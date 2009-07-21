@@ -50,12 +50,12 @@ module ObjStream
             end
           rescue Exception => e
             if !QUIET
-              puts "...something failed aquiring stream data and adding point, message: #{e.message}"
+              puts "....something failed aquiring stream data and adding point, message: #{e.message}"
               puts e.backtrace.inspect
             end
           end
           if !QUIET && WHINY
-            puts "...looking for value #{stream.parameter} attempt #{count}"
+            puts "....looking for value #{stream.parameter} attempt #{count}"
           end
           sleep(STREAM_WAIT)
           count += 1
@@ -70,7 +70,7 @@ module ObjStream
 
       begin
         if !QUIET && WHINY
-          puts "....about process serial data into stream: #{self.external_id}"
+          puts "....processing serial data into stream: #{self.external_id}"
         end
 
         if serial_connection
@@ -126,7 +126,7 @@ module ObjStream
       end
       self.points << stream_point
       added_point = true
-      puts "...acquired: #{self.parameter} #{value} at #{stream_point.point_date.strftime("%Y-%m-%d %H:%M:%S")}" if !QUIET
+      puts "....acquired: #{self.parameter} #{value} at #{stream_point.point_date.strftime("%Y-%m-%d %H:%M:%S")}" if !QUIET
       return added_point
     end
   end

@@ -33,7 +33,7 @@ module ObjDevice
       acquired_data = false
       #TODO make fail on the fail of any single stream
       if self.serial_connection != nil
-
+        puts "....acquiring raw data for device: #{self.serial_num}"  if !QUIET
         # Lets get some data for our serial connection
         fresh_data = self.serial_connection.serial_trx
 
@@ -47,11 +47,20 @@ module ObjDevice
       return acquired_data
     end
 
+    def map_connection(connection)
+      mapped = false
+      if self.serial_num == connection.name
+        self.serial_connection = connection
+        connection.device = self
+        mapped = true
+      end
+      return mapped
+    end
+
     def assign_connection(connections)
       assigned = false
       connections.serial_connections.each do |serial_connection|
         if self.serial_num == serial_connection.name
-          a = 1
           self.serial_connection = serial_connection
           serial_connection.device = self
           assigned = true
@@ -103,7 +112,7 @@ module ObjDevice
         while count < COMMAND_TRY do
           result = nil
           begin
-            puts "device: #{self.name} about to execute switch" if !QUIET && WHINY
+            puts "..device: #{self.serial_num} about to execute switch" if !QUIET && WHINY
 
             result = self.serial_connection.serial_trx(value, true)
             if result != nil

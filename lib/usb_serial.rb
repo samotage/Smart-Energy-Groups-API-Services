@@ -48,7 +48,7 @@ module UsbSerial
             count += 1
           end
         rescue Exception => e
-          puts "failed to connect on device on path: #{path} message: #{e.message}" if !QUIET
+          puts "..failed to connect on device on path: #{path} message: #{e.message}" if !QUIET
         end
       end
 
@@ -132,7 +132,7 @@ module UsbSerial
         mode = self.serial_connection.fcntl(Fcntl::F_GETFL, 0)
         self.serial_connection.fcntl(Fcntl::F_SETFL, mode & ~File::NONBLOCK)
       rescue Exception => e
-        puts "....failed to open serial connection on path #{path} message: #{e.message}" if !QUIET
+        puts "..failed to open serial connection on path #{path} message: #{e.message}" if !QUIET && WHINY && NEEDY
         self.serial_connection = nil
       end
       return self.serial_connection
@@ -143,7 +143,8 @@ module UsbSerial
       return_first = true
       puts "....looking for heartbeat on #{self.usb_port}..." if !QUIET
 
-      serial_data = self.serial_trx(nil, return_first)
+      # Not returning first, and setting an overide timeout of 2 sections to listen to serial.
+      serial_data = self.serial_trx(nil, false, 2)
 
       #TODO Make this retry if nothing useful found
       if serial_data
@@ -158,20 +159,24 @@ module UsbSerial
       return heartbeat
     end
 
-    def serial_trx(command=nil, return_first=nil)
+    def serial_trx(command=nil, return_first=nil, this_timeout=nil)
       # sends and recieves serial data, and returns an array of parsed sexpressions
       count = 0
       self.buffer = nil
       self.buffer = Array.new
       got_data = false
       
+      if !this_timeout
+        this_timeout = SERIAL_TIMEOUT
+      end
+      
       while count < SERIAL_TRY do
         begin
           begin
-            Timeout::timeout(SERIAL_TIMEOUT) do
+            Timeout::timeout(this_timeout) do
 
               if command != nil
-                puts "..serial trx - about to send serial command: #{command}"
+                puts "......serial trx - about to send serial command: #{command}"
                 self.serial_connection.puts command
                 sleep 0.01
               end
@@ -182,7 +187,7 @@ module UsbSerial
                 if serial_feed != nil
                   serial_chop = serial_feed.chop
                   if serial_chop != "" && serial_feed != "/n"
-                    puts "..serial trx - recieved fresh serial data: #{serial_chop}" if !QUIET && WHINY && NEEDY
+                    puts "......serial trx - recieved fresh serial data: #{serial_chop}" if !QUIET && WHINY && NEEDY
                     self.buffer << serial_chop
                     got_data = true
                     if return_first
@@ -190,15 +195,15 @@ module UsbSerial
                     end
                   end
                 else
-                  puts "..serial trx - received empty data..." if !QUIET && WHINY && NEEDY
+                  puts "......serial trx - received empty data..." if !QUIET && WHINY && NEEDY
                 end
               end
             end
           rescue Timeout::Error
-            puts "..serial trx - serial connection timeout."  if !QUIET && WHINY
+            puts "......serial trx - finished reading on serial connection: #{self.usb_port}."  if !QUIET && WHINY
           end
         rescue Exception => e
-          puts "..nn exception occured reading serial data, and exiting: #{e.message}"  if !QUIET && WHINY
+          puts "..an exception occured reading serial data, and exiting: #{e.message}"  if !QUIET && WHINY
         end
 
         if got_data
@@ -213,7 +218,7 @@ module UsbSerial
       # Now parse the sexps
       self.data_array = parse_sexp(self.buffer)
       if self.data_array != nil
-        puts "..serial trx - serial transaction read count: #{count}." if !QUIET
+        puts "......serial trx - serial transaction read count: #{count + 1}." if !QUIET
       end
 
       return self.data_array
@@ -224,13 +229,13 @@ module UsbSerial
       serial_output.each do |sexp|
         begin
           if sexp != nil &&  sexp != ""
-            puts "..parsing raw s-exp: #{sexp}" if !QUIET && WHINY && NEEDY
+            puts "........parsing raw s-exp: #{sexp}" if !QUIET && WHINY && NEEDY
             output = Array.new if !output
             parsed_sexp = SExpression.parse(sexp)
             output << parsed_sexp
           end
         rescue Exception => e
-          puts "crud s-expression found: #{sexp} and skipped, message: #{e.message}"
+          puts "........crud s-expression found: #{sexp} and skipped, message: #{e.message}"
         end
       end
       return output

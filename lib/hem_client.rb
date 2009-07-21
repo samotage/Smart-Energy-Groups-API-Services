@@ -75,27 +75,39 @@ module HemClient
           # Serial connections are re-assigned just in case a new on is found on the loopy.
 
           self.serial_connections = UsbSerial::Connections.establish_serial_connections
-          return nil if !self.serial_connections
+
+          if !self.serial_connections
+            puts "No serial connections found, and now exiting client loop." if !QUIET
+            return nil
+          end
 
           beating = self.serial_connections.check_all_beating
-          return nil if !beating
+
+          if !beating
+            puts "No serial connections not showing a heartbeat and now exiting client loop." if !QUIET
+            return nil
+          end
           
           # connections need to be asssigned on each loop, as there is a new site each time!
 
-          connections_assigned = self.site.assign_connections(self.serial_connections)
+          # The new way, driven by connections
+          connections_assigned = self.site.map_connections(self.serial_connections)
 
-           if !connections_assigned
-             puts "Serial connections could not be assigned to Energy manager devices - and exiting" if !QUIET
-             return nil
-           end
+          # The old way, driven by EM Devices
+          # connections_assigned = self.site.assign_connections(self.serial_connections)
+
+          if !connections_assigned
+            puts "Serial connections could not be assigned to Energy manager devices and now exiting" if !QUIET
+            return nil
+          end
 
           if connections_assigned
             # we can do stuff
             # Do the stuff, first up synch!
             synch_ok = self.site.synch_energisation
 
-            puts "Synch failed" if !QUIET && WHINY && !synch_ok
-            puts "Synch Ok" if !QUIET && WHINY && synch_ok
+            puts "Energisation synch failed" if !QUIET && WHINY && !synch_ok
+            puts "Energisation synch Ok" if !QUIET && WHINY && synch_ok
 
             got_data = self.site.acquire_data
 
@@ -106,22 +118,22 @@ module HemClient
               puts "Executed Commands #{count}---------------------------------"
             end
 
-       #     if got_data
-              self.site = self.site.put_site
-              if self.site
-                puts "Acquired data sent to HEM" if !QUIET && WHINY
+            #     if got_data
+            self.site = self.site.put_site
+            if self.site
+              puts "Acquired data sent to HEM" if !QUIET && WHINY
                 
-                puts "loop counter: #{count}" if !QUIET && WHINY
-                puts "sleeping now: #{self.site.poll_frequency} seconds" if !QUIET && WHINY
-                sleep(self.site.poll_frequency.to_i)
-              else
-                puts "Something failed sending acquired data to HEM" if !QUIET
-                sleep SERVER_TIMEOUT
-              end
-#            else
-#              puts "This loop: #{count} has nothing to send to HEM"
-#              sleep SERVER_TIMEOUT
-#            end
+              puts "loop counter: #{count}" if !QUIET && WHINY
+              puts "sleeping now: #{self.site.poll_frequency} seconds" if !QUIET && WHINY
+              sleep(self.site.poll_frequency.to_i)
+            else
+              puts "Something failed sending acquired data to HEM" if !QUIET
+              sleep SERVER_TIMEOUT
+            end
+            #            else
+            #              puts "This loop: #{count} has nothing to send to HEM"
+            #              sleep SERVER_TIMEOUT
+            #            end
           else
             # lets kill connections
             puts "serial connections not assigned, resetting before a retry" if !QUIET
@@ -132,19 +144,6 @@ module HemClient
         count += 1
       end
       return count
-    end
-
-    def establish_serial_connections
-      establish_ok = false
-
-      self.serial_connections = nil
-      self.serial_connections =
-
-        if self.serial_connections
-        establish_ok = true
-      end
-
-      return establish_ok
     end
   end
 end

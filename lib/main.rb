@@ -41,7 +41,7 @@ while true do
     hem_client = nil
   else
     if !QUIET
-      puts "something wierd is going on, so we have a little nap for #{SLEEPY_TIME} seconds"
+      puts "having a nap for #{SLEEPY_TIME} seconds now."
       if !QUIET
         sleep(SLEEPY_TIME)
       end

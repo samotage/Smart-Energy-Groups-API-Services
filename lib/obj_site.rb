@@ -23,7 +23,35 @@ module ObjSite
       @devices = Array.new
     end
 
+    def map_connections(serial_connections)
+      # Driven by available serial connections
+      mapped = false
+      serial_connections.serial_connections.each do |connection|
+        if connection != nil
+          puts "..trying to find a device for serial connection: #{connection.usb_port}"  if !QUIET
+
+          self.devices.each do |device|
+            this_mapped = device.map_connection(connection)
+
+            if this_mapped
+              puts "....mapped serial connection for EM device: #{device.serial_num}"  if !QUIET
+            else
+              puts "....could not map a serial connection for EM device: #{device.serial_num}"  if !QUIET
+            end
+
+            if !mapped && this_mapped
+              # we assign success even if only one has made it.
+              mapped = true
+            end
+          end
+        end
+      end
+      return mapped
+    end
+
     def assign_connections(serial_connections)
+
+      # Driven by the devices
       assigned = false
       self.devices.each do |device|
 
@@ -71,6 +99,7 @@ module ObjSite
     def acquire_data
       # go thorugh each site's devices and poll data for each of the streams...
       acquired_data = false
+      puts "..acquiring data for site: #{self.name}"  if !QUIET
       self.devices.each do |device|
         this_acquired_data = device.acquire_data
         if !acquired_data && this_acquired_data
