@@ -16,9 +16,10 @@ USB4 = '/dev/ttyUSB4'
 DEVICE_PATHS = [USB0, USB1, USB2, USB3]
 
 BAUDRATE = Termios::B115200
+#BAUDRATE = Termios::B9600
 
 #SERIAL_TIMEOUT = 500 # seconds
-SERIAL_TIMEOUT = 6 # seconds
+SERIAL_TIMEOUT = 2 # seconds
 SERIAL_WAIT = 0.2 # seconds
 SERIAL_TRY = 3
 
@@ -140,7 +141,6 @@ module UsbSerial
 
     def check_beating
       heartbeat = false
-      return_first = true
       puts "....looking for heartbeat on #{self.usb_port}..." if !QUIET
 
       # Not returning first, and setting an overide timeout of 2 sections to listen to serial.

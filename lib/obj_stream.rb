@@ -99,6 +99,8 @@ module ObjStream
         when "sum"
           value = 0 if !value
           value += this_value.to_f
+        when "instant"
+          value = this_value
         end
       end
 
