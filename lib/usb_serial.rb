@@ -19,7 +19,7 @@ BAUDRATE = Termios::B115200
 #BAUDRATE = Termios::B9600
 
 #SERIAL_TIMEOUT = 500 # seconds
-SERIAL_TIMEOUT = 2 # seconds
+SERIAL_TIMEOUT = 5 # seconds
 SERIAL_WAIT = 0.2 # seconds
 SERIAL_TRY = 3
 
@@ -59,14 +59,18 @@ module UsbSerial
 
     def check_all_beating
       #TODO make a better beating check
-      beating = true
+      beating = false
       begin
         self.serial_connections.each do |connection|
           puts "..about to check heartbeat on: #{connection.usb_port}" if !QUIET
-          beating = connection.check_beating
-          if !beating
+          this_beating = connection.check_beating
+          if !this_beating
             puts puts "..no heartbeat on: #{connection.usb_port} and setting to nil" if !QUIET
             connection = nil
+          end
+          if this_beating && !beating
+            #true exit condition.
+            beating = true
           end
         end
       rescue Exception => e

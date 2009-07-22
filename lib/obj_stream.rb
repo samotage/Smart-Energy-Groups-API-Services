@@ -99,8 +99,13 @@ module ObjStream
         when "sum"
           value = 0 if !value
           value += this_value.to_f
+        when "all"
+          acquired_data = add_stream_point(this_value.to_f)
         when "instant"
           value = this_value
+        else
+          puts "....no aggreagation rule for stream: #{self.aggregation_rule}"
+          value = nil
         end
       end
 
@@ -113,7 +118,10 @@ module ObjStream
           value = average
         end
       end
-      acquired_data = add_stream_point(value)
+
+      if self.aggregation_rule != "all" && value != nil
+        acquired_data = add_stream_point(value)
+      end
 
       return acquired_data
     end
